@@ -9,7 +9,7 @@ using namespace std;
            d,dp,s,h,delta, //present position(distance from left wall),previous position, size of bat, height of bat from ground, change in d due to one keypress
            l,t, //dimensions of bricks length and thickness
            dt;  //small time interval
-    XEvent batMove; //right left arrow key press event for bat movement
+    //XEvent batMove; //right left arrow key press event for bat movement
 
 
 int main()
@@ -81,15 +81,16 @@ int main()
         if(x>L-vx*dt*0.5 && vx>0)
             vx=-vx;
         // change position of bat
-        if(checkEvent(batMove) && keyPressEvent(batMove))
+        if(kbhit())
         {
-            char c = charFromEvent(batMove);
-            if(c=='a')
+            int c = 0;
+            c = getch();
+            if(c==75)
             {
                 if(d-s/2 > 0)
                     d -= delta;
             }
-            if(c=='d')
+            if(c==77)
             {
                 if(d+s/2 <L)
                     d += delta;

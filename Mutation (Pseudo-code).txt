@@ -1,0 +1,308 @@
+
+///////////// Mutation Pseudo-code /////////////
+
+void mutate_weight(int members, vector<int> mutate[])
+{
+    for(i from 0 to members)
+    {
+        /// Random select Connection to Mutrate
+        next_gen.offspring.append(curr_gen.offspring[mutate[i]])
+        int x = random(0,next_gen.offspring.end().genome.connection_gene.size())
+
+        /// Mutate connection weight
+        if(probability(probability_weight_tweak))
+            if(probability(0.5)) /// Tweak Weight
+                next_gen.offspring.end().genome.connection_gene(x).weight += delta_weight
+            else
+                next_gen.offspring.end().genome.connection_gene(x).weight -= delta_weight
+        else
+            next_gen.offspring.end().genome.connection_gene(x).weight = random(-weight_limit,weight_limit) /// Random Weight assign
+    }
+}
+
+void mutate_gene(int members, vector<int> mutate[])
+{
+    for(i from 0 to members)
+    {
+        /// Random select nodes for connection
+        next_gen.offspring.append(curr_gen.offspring[mutate[i]])
+        int x,y,n = next_gen.offspring.end().genome.node_gene.size()
+        for(;;)
+        {
+            for(;;)
+            {
+                x = random(0,n)
+                if(next_gen.offspring.end().genome.node_gene[x].type != 1)
+                    break;
+            }
+            for(;;)
+            {
+                y = random(0,n)
+                if(y!=x&&next_gen.offspring.end().genome.node_gene[x].type != -1)
+                    break
+            }
+            if((x,y) not in next_gen.offspring.end().genome.connection_gene())
+                break
+        }
+
+        /// Create connection
+        if(connection_gene_pool(x,y))
+        {
+            int innovation = connection_gene_pool(x,y).innovation_number
+            next_gen.offspring.end().genome.connection_gene.push_back(new connection_genes(x,y,random(-weight_limit,weight_limit),innovation))
+        }
+        else
+        {
+            connection_global_innovation_number++;
+            next_gen.offspring.end().genome.connection_gene.push_back(new connection_genes(x,y,random(-weight_limit,weight_limit),connection_global_innovation_number))
+        }
+
+    }
+}
+
+void mutate_gene_weight(int members, vector<int> mutate[])
+{
+    for(i from 0 to members)
+    {
+        /// Random select nodes for connection
+        next_gen.offspring.append(curr_gen.offspring[mutate[i]])
+        int x,y,n = next_gen.offspring.end().genome.node_gene.size()
+        for(;;)
+        {
+            for(;;)
+            {
+                x = random(0,n)
+                if(next_gen.offspring.end().genome.node_gene[x].type != 1)
+                    break;
+            }
+            for(;;)
+            {
+                y = random(0,n)
+                if(y!=x&&next_gen.offspring.end().genome.node_gene[x].type != -1)
+                    break
+            }
+            if((x,y) not in next_gen.offspring.end().genome.connection_gene())
+                break
+        }
+
+        /// Create connection
+        if(connection_gene_pool(x,y))
+        {
+            int innovation = connection_gene_pool(x,y).innovation_number
+            next_gen.offspring.end().genome.connection_gene.push_back(new connection_genes(x,y,random(-weight_limit,weight_limit),innovation))
+        }
+        else
+        {
+            connection_global_innovation_number++;
+            next_gen.offspring.end().genome.connection_gene.push_back(new connection_genes(x,y,random(-weight_limit,weight_limit),connection_global_innovation_number))
+        }
+
+        /// Mutate weight
+
+        /// Random connection
+        int x = random(0,next_gen.offspring.end().genome.connection_gene.size())
+
+        /// Mutate connection weight
+        if(probability(probability_weight_tweak))
+            if(probability(0.5)) /// Tweak Weight
+                next_gen.offspring.end().genome.connection_gene(x).weight += delta_weight
+            else
+                next_gen.offspring.end().genome.connection_gene(x).weight -= delta_weight
+        else
+            next_gen.offspring.end().genome.connection_gene(x).weight = random(-weight_limit,weight_limit) /// Random Weight assign
+
+
+    }
+}
+
+void mutate_node(int members, vector<int> mutate[])
+{
+    for(i from 0 to members)
+    {
+        /// Random select connection to Mutate
+        next_gen.offspring.append(curr_gen.offspring[mutate[i]])
+        int x
+        x = random(0,next_gen.offspring.end().connection_gene.size())
+
+        node input = next_gen.offspring.end().connection_gene(x).input
+        node output = next_gen.offspring.end().connection_gene(x).output
+        double weight = next_gen.offspring.end().connection_gene(x).weight
+
+        /// Create new node with innovation number
+        if(node_gene_pool(next_gen.offspring.end().connection_gene(x).innovation_number))
+        {
+            int innovation_number = node_gene_pool(next_gen.offspring.end().connection_gene(x).innovation_number).innovation_number
+            next_gen.offspring.end().node_gene.append(0,innovation_number)
+        }
+        else
+        {
+            global_node_innovation_number++;
+            next_gen.offspring.end().node_gene.append(0,global_node_innovation_number)
+        }
+
+        /// Add node to connection
+        next_gen.offspring.end().connection_gene(x).enabled = false
+        node k = next_gen.offspring.end().node_gene.end()
+
+        if(connection_gene_pool(input,k))
+        {
+            int innovation = connection_gene_pool(input,k).innovation_number
+            next_gen.offspring.end().genome.connection_gene.push_back(new connection_genes(input,k,1,innovation))
+        }
+        else
+        {
+            connection_global_innovation_number++;
+            next_gen.offspring.end().genome.connection_gene.push_back(new connection_genes(input,k,1,connection_global_innovation_number))
+        }
+
+        if(connection_gene_pool(k,output))
+        {
+            int innovation = connection_gene_pool(k,output).innovation_number
+            next_gen.offspring.end().genome.connection_gene.push_back(new connection_genes(k,output,weight,innovation))
+        }
+        else
+        {
+            connection_global_innovation_number++;
+            next_gen.offspring.end().genome.connection_gene.push_back(new connection_genes(k,output,weight,connection_global_innovation_number))
+        }
+    }
+}
+
+void mutate_node_weight(int members, vector<int> mutate[])
+{
+    for(i from 0 to members)
+    {
+        /// Random select connection to Mutate
+        next_gen.offspring.append(curr_gen.offspring[mutate[i]])
+        int x
+        x = random(0,next_gen.offspring.end().connection_gene.size())
+
+        node input = next_gen.offspring.end().connection_gene(x).input
+        node output = next_gen.offspring.end().connection_gene(x).output
+        double weight = next_gen.offspring.end().connection_gene(x).weight
+
+        /// Create new node with innovation number
+        if(node_gene_pool(next_gen.offspring.end().connection_gene(x).innovation_number))
+        {
+            int innovation_number = node_gene_pool(next_gen.offspring.end().connection_gene(x).innovation_number).innovation_number
+            next_gen.offspring.end().node_gene.append(0,innovation_number)
+        }
+        else
+        {
+            global_node_innovation_number++;
+            next_gen.offspring.end().node_gene.append(0,global_node_innovation_number)
+        }
+
+        /// Add node to connection
+        next_gen.offspring.end().connection_gene(x).enabled = false
+        node k = next_gen.offspring.end().node_gene.end()
+
+        if(connection_gene_pool(input,k))
+        {
+            int innovation = connection_gene_pool(input,k).innovation_number
+            next_gen.offspring.end().genome.connection_gene.push_back(new connection_genes(input,k,1,innovation))
+        }
+        else
+        {
+            connection_global_innovation_number++;
+            next_gen.offspring.end().genome.connection_gene.push_back(new connection_genes(input,k,1,connection_global_innovation_number))
+        }
+
+        if(connection_gene_pool(k,output))
+        {
+            int innovation = connection_gene_pool(k,output).innovation_number
+            next_gen.offspring.end().genome.connection_gene.push_back(new connection_genes(k,output,weight,innovation))
+        }
+        else
+        {
+            connection_global_innovation_number++;
+            next_gen.offspring.end().genome.connection_gene.push_back(new connection_genes(k,output,weight,connection_global_innovation_number))
+        }
+
+        /// Mutate weight
+
+        /// Random connection
+        int x = random(0,next_gen.offspring.end().genome.connection_gene.size())
+
+        /// Mutate connection weight
+        if(probability(probability_weight_tweak))
+            if(probability(0.5)) /// Tweak Weight
+                next_gen.offspring.end().genome.connection_gene(x).weight += delta_weight
+            else
+                next_gen.offspring.end().genome.connection_gene(x).weight -= delta_weight
+        else
+            next_gen.offspring.end().genome.connection_gene(x).weight = random(-weight_limit,weight_limit) /// Random Weight assign
+
+    }
+}
+
+void mutaion_species(vector<int> mutate[],int offspring)
+{
+    int x,members = mutate.size()
+    vector<int> to_mutate
+    for(;;)
+    {
+        /// Select Organisms to be Mutated Randomly
+        x = random(0,members)
+        if(x not in to_mutate)
+        {
+            to_mutate.append(x)
+            if(to_mutate.size()>= offspring*100 / percent_mutate)
+                break
+        }
+
+        /// Mutate Oragnism weights
+        int x1 = to_mutate.size()*100 / percent_weight_mutation
+        vector<int> to_mutate_weights
+        for(i from 0 to x1-1)
+        {
+            to_mutate_weights.append(to_mutate.pull(i))
+        }
+        mutate_weight(to_mutate_weights.size(), to_mutate_weights[])
+
+        /// Mutate Orgamism by Adding Genes
+        int x2 = to_mutate.size()*100 / percent_gene_mutation
+        vector<int> to_mutate_genes
+        for(i from x1 to x2-1)
+        {
+            to_mutate_genes.append(to_mutate.pull(i))
+        }
+        mutate_gene(to_mutate_genes.size(), to_mutate_genes[])
+
+        /// Mutate Organism by Adding Node
+        int x3 = to_mutate.size()*100 / percent_node_mutation
+        vector<int> to_mutate_nodes
+        for(i from x2 to x3-1)
+        {
+            to_mutate_nodes.append(to_mutate.pull(i))
+        }
+        mutate_node(to_mutate_nodes.size(), to_mutate_nodes[])
+
+        /// Combined Mutation Pending
+
+        /// Mutate Orgamism by Adding Genes and then mutate weights
+        int x4 = to_mutate.size()*100 / percent_gene_mutation
+        vector<int> to_mutate_genes_weights
+        for(i from x3 to x4-1)
+        {
+            to_mutate_genes_weights.append(to_mutate.pull(i))
+        }
+        mutate_gene_weight(to_mutate_genes_weights.size(), to_mutate_genes_weights[])
+
+        /// Mutate Organism by Adding Node and then mutate weights
+        vector<int> to_mutate_nodes_weights
+        for(i from x4 to members-1)
+        {
+            to_mutate_nodes_weights.append(to_mutate.pull(i))
+        }
+        mutate_node_weight(to_mutate_nodes_weights.size(), to_mutate_nodes_weights[])
+}
+
+/// This is the main_mutaion function which will be called for mutation
+void mutation()
+{
+    for(i from 0 to curr_gen.species.size())
+    {
+        mutaion_species(curr_gen.species[i].individual[],curr_gen.species[i].permitted_offspring)
+    }
+}

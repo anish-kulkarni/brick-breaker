@@ -26,8 +26,8 @@ int main()
         for(int j=0;j<n;j++)
             Brix[i][j]=true;
     //display
-    int d=DETECT,z;
-    initgraph(&d,&z,"C:\\TC\\BGI");
+    int q=DETECT,z;
+    initgraph(&q,&z,"C:\\TC\\BGI");
     rectangle(0,0,L,H);
     for(int i=0;i<m;i++)
         for(int j=0;j<n;j++){

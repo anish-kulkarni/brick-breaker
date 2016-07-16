@@ -5,9 +5,22 @@ Class Node_Gene{
 }
 Class Connection_Gene{
 	Node input;
-	Node Output;
+	Node output;
 	double weight;
 	boolean enabled;
+	int innovation_number;
+}
+
+Class Connection_pool
+{
+	int start;
+	int end;
+	int innovation_number;
+}
+
+Class Node_pool
+{
+	int broken_connection_number;
 	int innovation_number;
 }
 
@@ -33,6 +46,7 @@ Class Species {
 Class Generation{
 	Array<Organisms> offspring;
 	Array<Species> species;
-
+	Array<Connection_pool> connection_gene_pool;
+	Array<Node_pool> node_gene_pool;
 
 }}

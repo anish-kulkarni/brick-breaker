@@ -4,8 +4,8 @@ Class Node_Gene{
 	int innovation_number;
 }
 Class Connection_Gene{
-	Node input;
-	Node output;
+	int input;
+	int output;
 	double weight;
 	boolean enabled;
 	int innovation_number;

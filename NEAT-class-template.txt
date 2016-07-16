@@ -40,6 +40,7 @@ Class Species {
 	Array<Integers> individual // Array of indices of the offsprings that belong to the species
 	double avg_corrected_fitness;
 	int permitted_offsprings;
+	int permitted_mutants;
 	int stagnant_period;
 }
 

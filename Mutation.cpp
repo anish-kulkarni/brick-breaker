@@ -1,8 +1,15 @@
 
-///////////// Mutation Pseudo-code /////////////
+///////////// Mutation /////////////
 
-/// Ensure infinite loop selecting connection
+/// Ensure infinite loop selecting connection (optimize)
 
+/*
+* @param - x: start of the connection
+* @param - y: end of connection
+* description: check if connection in the organism
+* ……
+* @return - boolean whether the connection exists
+*/
 bool in_organism(int x,int y)
 {
     for(int i=0; i < next_gen.offspring.back().connection_genes.size(); i++)
@@ -13,6 +20,13 @@ bool in_organism(int x,int y)
     return false;
 }
 
+/*
+* @param - x: start of connection
+* @param - y: end of connection
+* description: check if connection mutation has happened in this generation
+* ……
+* @return - innovation number of the mutation else 0
+*/
 int in_connection_pool(int x,int y)
 {
     for(int i = 0; i < next_gen.connection_gene_pool.size(); i++)
@@ -24,6 +38,12 @@ int in_connection_pool(int x,int y)
     return 0;
 }
 
+/*
+* @param - x: the innovation number of the connection broken
+* description: check if node mutation has happened this generation
+* ……
+* @return - innovation number of the mutation else 0
+*/
 int in_node_pool(int x)
 {
     for(int i = 0; i < next_gen.node_gene_pool.size(); i++)
@@ -35,16 +55,33 @@ int in_node_pool(int x)
     return 0;
 }
 
+/*
+* @param - x: start of connection
+* @param - y: end of connection
+* @param - innovation_number: innovation number of the connection
+* description: add connection to innovation pool
+*/
 void add_connection_gene_pool(int x, int y, int innovation_number)
 {
     next_gen.connection_gene_pool.push_back(Connection_pool(x,y,innoavtion_number));
 }
 
+/*
+* @param - x: innovation number of broken connection
+* @param - innovation_number: innovation number of the node
+* description: add node to innovation pool
+*/
 void add_node_gene_pool(int x, int innovation_number)
 {
     next_gen.node_gene_pool.push_back(Node_pool(x,innoavtion_number));
 }
 
+/*
+* @param - members: number of organisms to mutate
+* @param - mutate[]: array of indices to mutate
+* @param - repeat_mutate: check if part of multiple mutations
+* description: mutate the organism by weight of connections
+*/
 void mutate_weight(int members, vector<int> mutate[], bool repeat_mutate)
 {
     for(int i = 0 ; i < members; i++)
@@ -69,6 +106,12 @@ void mutate_weight(int members, vector<int> mutate[], bool repeat_mutate)
     }
 }
 
+/*
+* @param - members: number of organisms to mutate
+* @param - mutate[]: array of indices to mutate
+* @param - repeat_mutate: check if part of multiple mutations
+* description: mutate the organism by adding connection
+*/
 void mutate_gene(int members, vector<int> mutate[], bool repeat_mutate)
 {
     for(int i = 0; i < members; i++)
@@ -85,7 +128,7 @@ void mutate_gene(int members, vector<int> mutate[], bool repeat_mutate)
                 return;
             for(;;)
             {
-                x = random_number(0,n-1);
+                x = random_number(0,n-2);
                 if(next_gen.offspring.back().genome.node_genes[x].type != 1)
                     pass_break=true;
             }
@@ -103,6 +146,8 @@ void mutate_gene(int members, vector<int> mutate[], bool repeat_mutate)
                 break;
 
         }
+        if(!pass_break)
+            return;
 
         //  Connection
         int innovation = in_connection_pool(next_gen.offspring.back().node_genes[x].innovation_number,next_gen.offspring.back().node_genes[y].innovation_number);
@@ -122,6 +167,12 @@ void mutate_gene(int members, vector<int> mutate[], bool repeat_mutate)
         mutate_weight(members , mutate[] , repeat_mutate);
 }
 
+/*
+* @param - members: number of organisms to mutate
+* @param - mutate[]: array of indices to mutate
+* @param - repeat_mutate: check if part of multiple mutations
+* description: mutate the organism by adding node
+*/
 void mutate_node(int members, vector<int> mutate[], bool repeat_mutate)
 {
     for(int i = 0; i < members; i++)
@@ -186,6 +237,11 @@ void mutate_node(int members, vector<int> mutate[], bool repeat_mutate)
         mutate_weight(members , mutate[] , repeat_mutate);
 }
 
+/*
+* @param - mutate[]: array of indices to mutate
+* @param - offspring: the number of offsprings to produce through mutation
+* description: select organisms from the species to mutate
+*/
 void mutaion_species(vector<int> mutate[],int offspring)
 {
     int x,members = mutate.size();
@@ -256,7 +312,9 @@ void mutaion_species(vector<int> mutate[],int offspring)
     mutate_node(to_mutate_nodes_weights.size(), to_mutate_nodes_weights[], true);
 }
 
-// This is the main_mutaion function which will be called for mutation
+/*
+* description: function called from main to perform mutation and provide offsprings
+*/
 void mutation()
 {
     for(int i = 0; i < curr_gen.species.size(); i++)

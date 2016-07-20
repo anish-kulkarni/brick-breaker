@@ -2,7 +2,6 @@
 ///////////// Mutation Pseudo-code /////////////
 
 /// Ensure infinite loop selecting connection
-/// Ensure weigth doesnt cross limit
 
 bool in_organism(int x,int y)
 {
@@ -57,7 +56,11 @@ void mutate_weight(int members, vector<int> mutate[], bool repeat_mutate)
 
         // Mutate connection weight
         if(probability(probability_weight_tweak))
-            if(probability(0.5)) // Tweak Weight
+            if(next_gen.offspring.back().genome.connection_genes[x].weight > weight_limit - delta_weight)
+                next_gen.offspring.back().genome.connection_genes[x].weight -= delta_weight;
+            else if(next_gen.offspring.back().genome.connection_genes[x].weight < -weight_limit + delta_weight)
+                next_gen.offspring.back().genome.connection_genes[x].weight += delta_weight;
+            else if(probability(0.5)) // Tweak Weight
                 next_gen.offspring.back().genome.connection_genes[x].weight += delta_weight;
             else
                 next_gen.offspring.back().genome.connection_genes[x].weight -= delta_weight;

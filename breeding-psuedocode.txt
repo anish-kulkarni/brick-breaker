@@ -1,0 +1,132 @@
+int global_innovation_num;			// global innovation number for mutations
+Generation past_gen, curr_gen, next_gen;
+
+//probabilities
+const int INTER_SPECIES = 0.01; 	//inter-species breeding
+const int BOTH_EN_DIS = 0.5; 		// Intra-species case: connection genes both enabled or both disabled
+const int ONE_EN_ONE_DIS = 0.75;	//Intra-species case: connection genes one enabled and other disabled
+
+/*
+* @param - int parent1, parent2 : the indices of the parents to breed in the Arraylist Generation.offspring
+* @param - int i, j : indices of the connection genes of the two parents to be compared
+			(Organism.genome.connection_gene array indices)
+* description - checks whther the inputs, outputs and innovation numbers of the two connection genes passed are the same
+* @return - (boolean) true if connection_genes are same, false otherwise 
+*/
+boolean compare_cg(int parent1, int i, int parent2, int j){
+	
+	return (this_gen.offspring[parent1].genome.connection_gene[i].in != this_gen.offspring[parent2].genome.connection_gene[j].in &&
+		this_gen.offspring[parent1].genome.connection_gene[i].out != this_gen.offspring[parent2].genome.connection_gene[j].out && 
+		this_gen.offspring[parent1].genome.connection_gene[i].innovation_number != this_gen.offspring[parent2].genome.connection_gene[j].innovation_num);
+
+}
+/*
+* @param - int more_fit, less_fit : indices of the parents in this_gen.offspring array
+* @param - int i : refers to the connection gene in fitter parent to be check in less fit parent
+* description - checks whether the passed connection gene in the fitter parent is in the connection genes
+				of the less fit parent
+* @return - true if passed connection gene exists in less fit parent, false otherwise
+*/
+int contains(int more_fit, int less_fit, int i){
+	
+	for(int j = 0; j < this_gen.offspring[less_fit].genome.connection_genes.getlength(); j++){
+		if(compare_cg(more_fit, i, less_fit, j)) return j;
+	}
+	return -1;
+}
+
+/*
+* @param - int male, female : the indices of the parents to breed in the Arraylist Generation.offspring
+*/
+void breed(int male, int female){
+	// determine relative fitness of parents
+	int more_fit = this_gen.offspring[male].fitness > this_gen.offspring[female].fitness ? male : female;
+	int less_fit = this_gen.offspring[male].fitness <= this_gen.offspring[female].fitness ? male : female;
+	
+	//new Organism - offspring of the parents passed
+	Organism child;
+
+	//pass all node genes of fitter parent to child
+	for(int i = 0; i < this_gen.offspring[more_fit].genome.node_genes.getlength(); i++){
+		child.genome.node_genes.append(this_gen.offspring[more_fit].genome.node_genes[i]);
+	}
+
+	//selectively passing the connection genes
+	for(int i = 0; i < this_gen.offspring[more_fit].genome.connection_genes.getlength(); i++){
+		int temp = contains(more_fit,less_fit, i);
+		if(temp != -1){
+			if(this_gen.offspring[more_fit].genome.connection_genes[i].enabled ? !this_gen.offspring[less_fit].genome.connection_genes[temp].enabled : this_gen.offspring[less_fit].genome.connection_genes[temp].enabled){ // XOR implementation
+				// one enabled and one disabled
+				if(this_gen.offspring[more_fit].genome.connection_genes[temp].enabled){
+				
+					if(probabilty(ONE_EN_ONE_DIS))
+						child.genome.connection_gene.append(this_gen.offspring[less_fit].genome.connection_genes[i]);
+					else
+						child.genome.connection_gene.append(this_gen.offspring[more_fit].genome.connection_genes[i]);
+				
+				} else {
+				
+					if(probabilty(ONE_EN_ONE_DIS))
+						child.genome.connection_gene.append(this_gen.offspring[more_fit].genome.connection_genes[i]);
+					else
+						child.genome.connection_gene.append(this_gen.offspring[less_fit].genome.connection_genes[i]);
+				}
+			} else {
+				
+				// both enabled or both disabled
+				if(probability(BOTH_EN_DIS))
+					child.genome.connection_gene.append(this_gen.offspring[more_fit].genome.connection_genes[i]);
+				else
+					child.genome.connection_gene.append(this_gen.offspring[less_fit].genome.connection_genes[i]);
+			
+			}
+
+		} else {
+			child.genome.connection_gene.append(this_gen.offspring[more_fit].genome.connection_genes[i]);
+		}
+	}
+}
+
+//probably part of the main() in the actual program
+calling_function(){
+	
+	//inter-species breeding
+	if(probability(INTER_SPECIES)){
+		int species1 = getRandom(0, this_gen.species.length-1);
+		int species2 = getRandom(0, this_gen.species.length-1);
+
+		this_gen.species[species1].permitted_offsprings--;
+		this_gen.species[species2].permitted_offsprings--;
+
+		int parent1 = getRandom(0, this_gen.species[species1].individual.length - 1);
+		int parent2 = getRandom(0, this_gen.species[species2].individual.length - 1);
+
+		breed(parent1,parent2);
+	}
+
+	for(int i = 0; i < this_gen.species.length; i++) {
+		next_gen.offspring.append(this_gen.offsprings[this_gen.species[i].individual[0]]) // appending the champion of each spieces directly to next gen
+
+		//get permitted number of offsprings for ith species
+		int num_children = this_gen.species[i].permitted_offsprings;
+
+		//iterate over the number of children
+		for(int j = 0; j < num_children; j++){
+
+			// The modular space handles the case where the number of individuals of a species is less than half permitted offsprings
+			// The ternary operator gives out put as ceiling function
+			int parent1 = getRandom(0,(num_children % 2 == 0 ? num_children : num_children+1) / 2) % this_gen.species[i].individual.length;
+			int parent2 = getRandom(0,(num_children % 2 == 0 ? num_children : num_children+1) / 2) % this_gen.species[i].individual.length;
+
+			//take the next of either parent if they have used up their respective permitted number of individual offsprings
+			while(!(this_gen.species[parent1].allowed_offsprings > 0) || !(this_gen.species[parent2].allowed_offsprings > 0)){
+				if(!(this_gen.species[parent1].allowed_offsprings > 0))
+					parent1 = (parent1 + 1) % this_gen.species[i].individual.length;
+				else
+					parent2 = (parent2 + 1) % this_gen.species[i].individual.length;
+			}
+
+			breed(parent1, parent2);
+		}
+	}
+}

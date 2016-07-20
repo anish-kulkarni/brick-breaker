@@ -12,9 +12,9 @@ int in_connection_pool(int x,int y)
     return 0
 }
 
-int in_connection_pool(int x)
+int in_node_pool(int x)
 {
-    for(i from 0 to next_gen.connection_gene_pool.size())
+    for(i from 0 to next_gen.node_gene_pool.size())
     {
         if(next_gen.node_gene_pool[i].broken_connection_number==x)
             return next_gen.node_gene_pool[i].innovation_number

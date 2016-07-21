@@ -1,0 +1,22 @@
+main(){
+	
+	
+int global_innovation_num;			// global innovation number for mutations
+Generation past_gen, curr_gen, next_gen;
+int generation_num = 0;
+const POPULATION = 150;
+
+int main(){
+	det_fitness();
+	speciate(); -> will be stored in dec order of fitness within each species
+	adjust_fitness();
+	avg_corrected_fitness();
+	update_permitted_offsprings();
+	eradicate();
+	mutate();
+	breed();
+	update_generations();
+	
+	
+}
+}

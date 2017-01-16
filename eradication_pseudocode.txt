@@ -1,0 +1,96 @@
+/*
+* if species has shown inmprovement relative to previous generation, stagnant period is set to 0, else increased by 1.
+*/
+void update_stagnant_period(){
+    int past_champion_index,curr_champion_index;
+    for (i=0 to curr_gen.species.size() - 1 ){
+        curr_champion_index = curr_gen.species[i].individual[0]
+        past_champion_index = past_gen.species[i].individual[0]
+        if curr_gen.offspring[curr_champion_index].fitness > past_gen.offspring[past_champion_index].fitness
+            curr_gen.species[i].stagnant_period = 0;
+        else
+            curr_gen.species[i].stagnant_period++;
+    }
+}
+
+/*
+* returns true if champion of 2nd species is fitter than champion of 1st species. Else returns false.
+*/
+bool compare_species(int index1,int index2){
+    int champion1 = curr_gen.species[index1].individual[0],
+        champion2 = curr_gen.species[index2].individual[0]
+    return curr_gen.offspring[champion1] < curr_gen.offspring[champion2]
+}
+
+/*
+* If a species doesn't have the fittest champion and has shown no improvement in last max_stagnant_period generations,
+it is not alowed to reproduce. (except in the extreme case that there is only one species.)
+*/
+
+void eradicate_if_not_fittest(){
+    if(curr_gen.species.size() == 1)
+        return;
+    update_stagnant_period();
+    //identify fittest species on basis of champion
+    int fittest_species_index=0;
+    for (i=0 to curr_gen.species.size() - 1 )
+        if(compare_species(fittest_species_index,i))
+            fittest_species_index = i;
+    //eradicate all but fittest species
+    for (i=0 to curr_gen.species.size() - 1 ){
+        if(i != fittest_species_index && curr_gen.species[i].stagnant_period > max_stagnant_period){
+            curr_gen.species[i].permitted_offsprings = 0;
+        }
+    }
+}
+
+/*
+* If the species with the least fit champion has shown no improvement in last max_stagnant_period generations,
+it is not alowed to reproduce. (except in the extreme case that there is only one species.)
+*/
+
+void eradicate_only_weakest(){
+    if(curr_gen.species.size() == 1)
+        return;
+    update_stagnant_period();
+    //identify weakest species on basis of champion
+    int weakest_species_index=0;
+    for (i=0 to curr_gen.species.size() - 1 )
+        if(compare_species(i,fittest_species_index))
+            weakest_species_index = i;
+    //eradicate weakest if stagnant too long
+    if( curr_gen.species[weakest_species_index].stagnant_period > max_stagnant_period )
+        curr_gen.species[weakest_species_index].permitted_offsprings = 0
+}
+
+/*
+* returns true if champion of 2nd species is fitter than champion of 1st species. Else returns false.
+*/
+bool compare_species(int index1,int index2){
+    int champion1 = curr_gen.species[index1].individual[0],
+        champion2 = curr_gen.species[index2].individual[0]
+    return curr_gen.offspring[champion1] < curr_gen.offspring[champion2]
+}
+
+/*
+* eradicates all stagnant species with champion fitness < fraction*(highest fitness in the population)
+*/
+void eradicate_fraction(double fraction){
+    if(curr_gen.species.size() == 1)
+        return;
+    update_stagnant_period();
+    //generate list of species indices sorted in increasing order of fitness
+    int sorted_list[curr_gen.species.size()];
+    for(int i=0 to curr_gen.species.size())
+        sorted_list[i] = i;
+    sort(sorted_list ,sorted_list + curr_gen.species.size(), compare_species());
+    //eradicate if fitnness< fraction*highest_fitness and stagnant
+    int fittest_species_index = sorted_list[curr_gen.species.size()-1],
+        fittest_champion_index = curr_gen.species[fittest_species_index].indiviual[0],
+        threshold_fitness = fraction*curr_gen.offspring[fittest_champion_index].fitness;
+    for(int i=0 to curr_gen.species.size()){
+        int champion_index_i = curr_gen.species[sorted_list[i]].individual[0]
+        if(curr_gen.offspring[champion_index_i].fitness < threshold_fitness)
+            curr_gen.species[sorted_list[i]].permitted_offsprings = 0
+    }
+}
